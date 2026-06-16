@@ -60,10 +60,18 @@ def kmeans(data, k):
     * centroids - numpy array of shape (k, 2), centroid for each cluster.
     """
 
-    labels = np.zeros(data.shape[0])
-    centroids = np.shape(k, 2)
+    centroids = choose_initial_centroids(data, k)
+    labels = assign_to_clusters(data, centroids)
+    prev_centroids = centroids
+    centroids = recompute_centroids(data,labels,k)
+    labels = assign_to_clusters(data, centroids)
+    while(not np.array_equal(centroids,prev_centroids)):
+        prev_centroids = centroids
+        centroids = recompute_centroids(data,labels,k)
+        labels = assign_to_clusters(data, centroids)
 
-    # return labels, centroids
+
+    return labels, centroids
 
 
 def visualize_results(data, labels, centroids, path):
@@ -74,8 +82,19 @@ def visualize_results(data, labels, centroids, path):
     :param centroids: the final centroids of kmeans, as numpy array of shape (k, 2)
     :param path: path to save the figure to.
     """
-    pass
-    # plt.savefig(path)
+
+
+    for i in range(len(centroids)):
+        current_cluster = []
+        current_counter = 0
+        for j in range(len(labels)):
+            if (labels[j] == centroids[i]):
+                current_cluster[current_counter] = data[j]
+                current_counter += 1
+        plt.scatter(*current_cluster.T)
+
+    plt.savefig(path)
+    plt.close('all')
 
 
 def dist(x, y):
@@ -96,10 +115,17 @@ def assign_to_clusters(data, centroids):
     :param centroids: current centroids as numpy array of shape (k, 2)
     :return: numpy array of size n
     """
-    for point in data:
-        for centroid in centroids:
-
-    # return labels
+    labels = np.zeros(data.shape[0])
+    for point in range(len(data)):
+        min_val = dist(data[point],centroids[0])
+        min_index = 0
+        for i in range(len(centroids)):
+            temp_val = dist(data[point],centroids[i])
+            if(temp_val < min_val):
+                min_val = temp_val
+                min_index = i
+        labels[point] = centroids[min_index]        
+    return labels
 
 
 def recompute_centroids(data, labels, k):
@@ -110,6 +136,22 @@ def recompute_centroids(data, labels, k):
     :param k: number of clusters
     :return: numpy array of shape (k, 2)
     """
-    pass
-    # return centroids
+    centroids = np.shape(k, 2)
+    for i in range(len(centroids)):
+        sum_x = 0
+        sum_y = 0
+        point_counter = 0
+        for j in range(len(labels)):
+            if (labels[j] == centroids[i]):
+                sum_x += data[j][0]
+                sum_y += data[j][1]
+                point_counter += 1
+            
+        centroids[i] = (sum_x / point_counter, sum_y / point_counter)
+    return centroids
+        
+
+
+        
+    
 
