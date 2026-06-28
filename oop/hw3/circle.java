@@ -40,7 +40,7 @@ public class Circle extends Shape{
             res.append("  /n");
             
         }
-        return res;
+        return res.toString();
     }
     @Override
     public boolean equals(Object obj){
